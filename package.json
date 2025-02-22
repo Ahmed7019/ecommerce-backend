@@ -1,0 +1,24 @@
+{
+  "name": "e-commerce-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server",
+    "dev": "node --watch --env-file=.env server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ahmed7019/ecommerce-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ahmed7019/ecommerce-backend/issues"
+  },
+  "homepage": "https://github.com/Ahmed7019/ecommerce-backend#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
