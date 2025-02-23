@@ -146,4 +146,40 @@ router.put("/id/:id", upload.array(), (req, res) => {
   res.status(200).json(updatedProduct);
 });
 
+// DELTE methods
+
+// Delete using ID
+
+router.delete("/id/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const productToDelete = products.find((product) => product.id === id);
+
+  if (!productToDelete) {
+    return res.status(404).json({ msg: `Product with id ${id} was not found` });
+  }
+
+  const newProducts = products.filter((product) => product.id !== id);
+  res.status(200).json(newProducts);
+});
+
+// Delete using name
+router.delete("/:name", (req, res) => {
+  // if (isNaN(req.params.name)) {
+  const name = req.params.name.toLowerCase();
+  const product = products.find((product) =>
+    product.name.toLowerCase().includes(name)
+  );
+  // }
+  if (!product) {
+    return res
+      .status(404)
+      .json({ msg: `product with name ${req.params.name} was not found` });
+  }
+
+  const newProducts = products.filter(
+    (product) => !product.name.toLowerCase().includes(name)
+  );
+  res.status(200).json(newProducts);
+});
+
 export default router;
