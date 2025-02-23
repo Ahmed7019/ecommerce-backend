@@ -1,7 +1,7 @@
 import express from "express";
-
+import multer from "multer";
 const router = express.Router();
-
+const upload = multer();
 const products = [
   {
     id: 1,
@@ -99,6 +99,28 @@ router.get("/id/:id", (req, res) => {
 
     res.status(201).json(product);
   }
+});
+
+// Add post
+// class Product {
+//   constructor(id, name, price, brand) {
+//     this.id = id;
+//     this.name = name;
+//     this.price = price;
+//     this.brand = brand;
+//   }
+// }
+
+router.post("/", upload.single(), (req, res) => {
+  console.log("Request Headers:", req.headers);
+  console.log("Request Body:", req.params);
+  products.push({
+    id: products.length + 1,
+    name: req.body.name,
+    price: req.body.price,
+    brand: req.body.brand,
+  });
+  res.json(products);
 });
 
 export default router;
