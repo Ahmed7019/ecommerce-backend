@@ -114,13 +114,36 @@ router.get("/id/:id", (req, res) => {
 router.post("/", upload.single(), (req, res) => {
   console.log("Request Headers:", req.headers);
   console.log("Request Body:", req.params);
+  if (!req.body.name || !req.body.price || !req.body.brand) {
+    return res.status(404).json({ msg: "One of the fields is missing" });
+  }
+
   products.push({
     id: products.length + 1,
     name: req.body.name,
     price: req.body.price,
     brand: req.body.brand,
   });
-  res.json(products);
+  res.status(200).json(products);
+});
+
+// Update a product
+
+router.put("/id/:id", upload.array(), (req, res) => {
+  const id = parseInt(req.params.id);
+  const updatedProduct = products.find((product) => product.id === id);
+
+  if (!updatedProduct) {
+    return res.status(404).json({ msg: "The product was not found" });
+  }
+  if (!req.body.name || !req.body.price || !req.body.brand) {
+    return res.status(404).json({ msg: "One of the fields is missing" });
+  }
+
+  updatedProduct.name = req.body.name;
+  updatedProduct.price = req.body.price;
+  updatedProduct.brand = req.body.brand;
+  res.status(200).json(updatedProduct);
 });
 
 export default router;
