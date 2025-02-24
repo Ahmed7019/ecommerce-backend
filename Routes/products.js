@@ -65,51 +65,49 @@ const products = [
   },
 ];
 
-router.get("/", (req, res) => {
+router.get("/", (req, res, next) => {
+  if (!products.length || !products) {
+    const err = new Error(`No product was found`);
+    err.status = 404;
+    return next(err);
+  }
   res.status(200).json(products);
 });
 
 // Search by name
-router.get("/:name", (req, res) => {
+router.get("/:name", (req, res, next) => {
   if (isNaN(req.params.name)) {
     const name = req.params.name.toLowerCase();
     const productName = products.filter((product) =>
       product.name.toLowerCase().includes(name)
     );
     if (!productName || productName.length === 0) {
-      return res
-        .status(404)
-        .json({ msg: `product with name ${req.params.name} was not found` });
+      const err = new Error(
+        `product with name ${req.params.name} was not found`
+      );
+
+      err.status = 404;
+      return next(err);
     }
 
     res.status(201).json(productName);
   }
 });
 
-router.get("/id/:id", (req, res) => {
+router.get("/id/:id", (req, res, next) => {
   if (parseInt(req.params.id)) {
     const id = parseInt(req.params.id);
     const product = products.find((product) => product.id === id);
 
     if (!product) {
-      return res
-        .status(404)
-        .json({ msg: `product with id ${id} was not found` });
+      const error = new Error(`product with id ${id} was not found`);
+      error.status = 404;
+      return next(error);
     }
 
     res.status(201).json(product);
   }
 });
-
-// Add post
-// class Product {
-//   constructor(id, name, price, brand) {
-//     this.id = id;
-//     this.name = name;
-//     this.price = price;
-//     this.brand = brand;
-//   }
-// }
 
 router.post("/", upload.single(), (req, res) => {
   console.log("Request Headers:", req.headers);
@@ -150,12 +148,14 @@ router.put("/id/:id", upload.array(), (req, res) => {
 
 // Delete using ID
 
-router.delete("/id/:id", (req, res) => {
+router.delete("/id/:id", (req, res, next) => {
   const id = parseInt(req.params.id);
   const productToDelete = products.find((product) => product.id === id);
 
   if (!productToDelete) {
-    return res.status(404).json({ msg: `Product with id ${id} was not found` });
+    const err = new Error(`Product with id ${id} was not found`);
+    err.status = 404;
+    next(err);
   }
 
   const newProducts = products.filter((product) => product.id !== id);
