@@ -1,6 +1,9 @@
 import express from "express";
 import cors from "cors";
+
 import products from "./Routes/products.js";
+import stores from "./Routes/stores.js";
+
 import bodyParser from "body-parser";
 import logger from "./middleware/logger.js";
 import errorHandler from "./middleware/error.js";
@@ -20,6 +23,7 @@ app.use(logger);
 
 // Routes
 app.use("/api/products", products);
+app.use("/api/stores", stores);
 
 // Error handler
 app.use(notFound);
