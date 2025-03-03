@@ -1,6 +1,10 @@
 import express from "express";
 
-import { getStoreById, getStores } from "../controllers/storesController.js";
+import {
+  getStoreById,
+  getStoreByName,
+  getStores,
+} from "../controllers/storesController.js";
 const router = express.Router();
 
 // Get all stores
@@ -9,6 +13,6 @@ router.get("/", getStores);
 router.get("/id/:id", getStoreById);
 
 // Get store by name
-router.get("/:name");
+router.get("/:name", getStoreByName);
 
 export default router;

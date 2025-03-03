@@ -155,3 +155,19 @@ export const getStoreById = (req, res, next) => {
     res.status(200).json(store);
   }
 };
+
+export const getStoreByName = (req, res, next) => {
+  if (isNaN(req.params.name)) {
+    const name = req.params.name.toLowerCase();
+    const storeName = stores.filter((store) =>
+      store.name.toLowerCase().includes(name)
+    );
+    if (!storeName || storeName.length === 0) {
+      const err = new Error(` ${req.params.name} was not found`);
+      err.status = 404;
+      return next(err);
+    }
+
+    res.status(201).json(storeName);
+  }
+};
