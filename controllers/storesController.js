@@ -137,3 +137,21 @@ export const getStores = (req, res, next) => {
 
   res.status(200).json(stores);
 };
+
+// @desc    Get a store by Id
+// @route   /api/stores/id/:id
+
+export const getStoreById = (req, res, next) => {
+  if (parseInt(req.params.id)) {
+    const id = parseInt(req.params.id);
+    const store = stores.find((store) => store.id === id);
+
+    if (!store) {
+      const err = new Error(`Store with id ${id} was not found`);
+      err.status = 404;
+      return next(err);
+    }
+
+    res.status(200).json(store);
+  }
+};
