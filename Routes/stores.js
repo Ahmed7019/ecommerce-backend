@@ -1,7 +1,8 @@
 import express from "express";
 
 import {
-    createNewStore,
+  createNewStore,
+  deleteStore,
   getStoreById,
   getStoreByName,
   getStores,
@@ -17,5 +18,8 @@ router.get("/id/:id", getStoreById);
 router.get("/:name", getStoreByName);
 
 // CREATE a new store
-router.post("/",createNewStore)
+router.post("/", createNewStore);
+
+// Delete a store
+router.delete("/id/:id", deleteStore);
 export default router;

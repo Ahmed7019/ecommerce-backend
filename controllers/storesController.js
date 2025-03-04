@@ -198,3 +198,23 @@ export const createNewStore =
 
     res.status(200).json(stores);
   });
+
+// @desc    DELETE a store using id
+// @route   DELETE /api/stores/id
+
+export const deleteStore = (req, res, next) => {
+  const id = parseInt(req.params.id);
+  const storeToDelete = stores.find((store) => store.id === id);
+
+  //Handle error
+  if (!storeToDelete) {
+    const err = new Error(`Store with id ${id} was not found`);
+    err.status = 404; // Not found
+    return next(err);
+  }
+
+  // If the store was found
+  const newStores = stores.filter((store) => store.id !== id);
+
+  res.status(200).json(newStores);
+};
