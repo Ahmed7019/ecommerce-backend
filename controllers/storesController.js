@@ -156,6 +156,9 @@ export const getStoreById = (req, res, next) => {
   }
 };
 
+// @desc    Get a store by name
+// @route   GET /api/stores/ :name
+
 export const getStoreByName = (req, res, next) => {
   if (isNaN(req.params.name)) {
     const name = req.params.name.toLowerCase();
@@ -171,3 +174,27 @@ export const getStoreByName = (req, res, next) => {
     res.status(201).json(storeName);
   }
 };
+
+// @desc    POST a store
+// @route   POST /api/stores
+export const createNewStore =
+  (upload.array(),
+  (req, res, next) => {
+    // Handle error
+    if (!req.body.name || !req.body.bio || !req.body.sells) {
+      const err = new Error(`Please fill all the fields`);
+      err.status = 400; // Bad HTTP req
+      return next(err);
+    }
+
+    // Add the store to the array
+
+    stores.push({
+      id: stores.length + 1,
+      name: req.body.name,
+      bio: req.body.bio,
+      sells: req.body.sells,
+    });
+
+    res.status(200).json(stores);
+  });
