@@ -6,6 +6,7 @@ import {
   getStoreById,
   getStoreByName,
   getStores,
+  updateInfo,
 } from "../controllers/storesController.js";
 const router = express.Router();
 
@@ -19,6 +20,9 @@ router.get("/:name", getStoreByName);
 
 // CREATE a new store
 router.post("/", createNewStore);
+
+// Update store info using ID
+router.put("/id/:id", updateInfo);
 
 // Delete a store
 router.delete("/id/:id", deleteStore);

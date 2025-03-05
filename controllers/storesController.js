@@ -199,6 +199,36 @@ export const createNewStore =
     res.status(200).json(stores);
   });
 
+// @desc    Update store info
+// @route   PUT /api/stores/id/:id
+export const updateInfo =
+  (upload.any(),
+  (req, res, next) => {
+    const id = parseInt(req.params.id);
+    const storeToUpdate = stores.find((store) => store.id === id);
+
+    // Check if the store doesn't exist
+    if (!storeToUpdate) {
+      const err = new Error(`Store with id ${id} was not fonud`);
+      err.status = 404;
+      return next(err);
+    }
+    console.log(req.body);
+
+    //   Check if one of the fields is missing
+    if (!req.body.name || !req.body.bio || !req.body.sells) {
+      const err = new Error(`Please fill all the fields`);
+      err.status = 400; // Bad request
+      return next(err);
+    }
+
+    storeToUpdate.name = req.body.name;
+    storeToUpdate.bio = req.body.bio;
+    storeToUpdate.sells = req.body.sells;
+
+    res.status(200).json(storeToUpdate);
+  });
+
 // @desc    DELETE a store using id
 // @route   DELETE /api/stores/id
 
