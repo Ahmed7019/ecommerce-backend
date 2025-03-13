@@ -9,7 +9,7 @@ import logger from "./middleware/logger.js";
 import errorHandler from "./middleware/error.js";
 import notFound from "./middleware/notFound.js";
 
-import mysql from "mysql2";
+import connection from "./Database/connection.js";
 
 const PORT = process.env.PORT || 8080;
 
@@ -32,12 +32,7 @@ app.use(notFound);
 app.use(errorHandler);
 
 // Connect to DB
-const connection = mysql.createConnection({
-  host: process.env.HOST,
-  user: process.env.USER,
-  password: process.env.PASSWORD,
-  database: process.env.DB,
-});
+
 
 connection.connect((err) => {
   if (err) {
