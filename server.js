@@ -9,6 +9,8 @@ import logger from "./middleware/logger.js";
 import errorHandler from "./middleware/error.js";
 import notFound from "./middleware/notFound.js";
 
+import mysql from "mysql2";
+
 const PORT = process.env.PORT || 8080;
 
 const app = express();
@@ -29,4 +31,23 @@ app.use("/api/stores", stores);
 app.use(notFound);
 app.use(errorHandler);
 
-app.listen(PORT, () => console.log(`Server is running on port => ${PORT}`));
+// Connect to DB
+const connection = mysql.createConnection({
+  host: process.env.HOST,
+  user: process.env.USER,
+  password: process.env.PASSWORD,
+  database: process.env.DB,
+});
+
+connection.connect((err) => {
+  if (err) {
+    console.log("A error has been occurred " + "while connecting to database.");
+    throw err;
+  }
+
+  app.listen(PORT, () =>
+    console.log(
+      `DB connection established & Server is running on port => ${PORT}`
+    )
+  );
+});
