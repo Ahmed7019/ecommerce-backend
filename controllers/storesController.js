@@ -181,7 +181,18 @@ export const getStoreByName = (req, res, next) => {
 export const createNewStore =
   (upload.array(),
   (req, res, next) => {
-    insertUser(req.body, res, next);
+    if (!req.body.name || !req.body.bio || !req.body.sells) {
+      const err = new Error("Please Fill all the fields");
+      err.status = 400;
+      return next(err);
+    }
+    stores.push({
+      name: req.body.name,
+      bio: req.body.bio,
+      sells: req.body.sells,
+    });
+
+    res.status(200).json(stores);
   });
 
 // @desc    Update store info

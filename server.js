@@ -3,6 +3,7 @@ import cors from "cors";
 
 import products from "./Routes/products.js";
 import stores from "./Routes/stores.js";
+import user from "./Routes/user.js";
 
 import bodyParser from "body-parser";
 import logger from "./middleware/logger.js";
@@ -26,13 +27,13 @@ app.use(logger);
 // Routes
 app.use("/api/products", products);
 app.use("/api/stores", stores);
+app.use("/api/user", user);
 
 // Error handler
 app.use(notFound);
 app.use(errorHandler);
 
 // Connect to DB
-
 
 connection.connect((err) => {
   if (err) {
