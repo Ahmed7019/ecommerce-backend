@@ -1,4 +1,5 @@
 import {
+  deleteUserQuery,
   getUserQuery,
   insertUser,
   updateUserQuery,
@@ -31,7 +32,9 @@ export const createNewUser =
     insertUser(req.body, res, next);
   });
 
-//  @desc Update an existing user
-export const updateUser = (req, res, next) => {
-  updateUserQuery(req, res, next);
-};
+//  @desc     Update an existing user
+//  @route    PUT  / api/user/:id
+export const updateUser = (...args) => updateUserQuery(...args);
+// @desc    Delete user
+// @route   DELETE /api/user/:id
+export const deleteUser = (...args) => deleteUserQuery(...args);
