@@ -1,4 +1,8 @@
-import { getUserQuery, insertUser } from "../Database/querys.js";
+import {
+  getUserQuery,
+  insertUser,
+  updateUserQuery,
+} from "../Database/querys.js";
 import multer from "multer";
 
 const upload = multer();
@@ -6,7 +10,8 @@ const upload = multer();
 // @desc    Get the user using id
 // @route   GET /api/user/id
 export const getUser = (req, res, next) => getUserQuery(req, res, next);
-// @desc    POST a user
+
+// @desc    Create a new user
 // @route   POST /api/ user
 export const createNewUser =
   (upload.array(),
@@ -25,3 +30,8 @@ export const createNewUser =
 
     insertUser(req.body, res, next);
   });
+
+//  @desc Update an existing user
+export const updateUser = (req, res, next) => {
+  updateUserQuery(req, res, next);
+};
