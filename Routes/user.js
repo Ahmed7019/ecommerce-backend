@@ -1,16 +1,13 @@
 import express from "express";
-import { createNewUser } from "../controllers/usersController.js";
+import { createNewUser, getUser } from "../controllers/usersController.js";
 
 const router = express.Router();
 
 // @desc GET all users
 // router.get("/", getProducts);
 
-// GET using name
-// router.get("/:name", getProductByName);
-
-// GET using id
-// router.get("/id/:id", getProductById);
+// @desc GET using id
+router.get("/:id", getUser);
 
 // @desc Create a product
 router.post("/", createNewUser);

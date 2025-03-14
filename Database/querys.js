@@ -15,3 +15,24 @@ export const insertUser = (user, res, next) => {
     }
   );
 };
+
+export const getUserQuery = (req, res, next) => {
+  const id = parseInt(req.params.id);
+  connection.query(
+    `SELECT * FROM users WHERE user_id = ${id}`,
+    (err, result) => {
+      if (err) {
+        const error = new Error(`User with ID ${id} was not found`);
+        error.status = 404;
+        return next(error);
+      }
+
+      if (!result || !result.length) {
+        const error = new Error(`No user with ID ${id}`);
+        error.status = 404;
+        return next(error);
+      }
+      res.status(200).json(result);
+    }
+  );
+};

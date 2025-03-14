@@ -1,8 +1,11 @@
-import { insertUser } from "../Database/querys.js";
+import { getUserQuery, insertUser } from "../Database/querys.js";
 import multer from "multer";
 
 const upload = multer();
 
+// @desc    Get the user using id
+// @route   GET /api/user/id
+export const getUser = (req, res, next) => getUserQuery(req, res, next);
 // @desc    POST a user
 // @route   POST /api/ user
 export const createNewUser =
@@ -16,7 +19,7 @@ export const createNewUser =
       !req.body.role
     ) {
       const err = new Error(`One or more field is missing`);
-      err.status = 400;
+      err.status = 404;
       return next(err);
     }
 
