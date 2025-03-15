@@ -13,7 +13,7 @@ const router = express.Router();
 // Get all stores
 router.get("/", getStores);
 // Get store by id
-router.get("/id/:id", getStoreById);
+router.get("/:id", getStoreById);
 
 // Get store by name
 router.get("/:name", getStoreByName);

@@ -3,7 +3,7 @@ import {
   getUserQuery,
   insertUser,
   updateUserQuery,
-} from "../Database/querys.js";
+} from "../Database/userQuerys.js";
 import multer from "multer";
 
 const upload = multer();
@@ -34,6 +34,7 @@ export const createNewUser =
 
 //  @desc     Update an existing user
 //  @route    PUT  / api/user/:id
+
 export const updateUser = (...args) => updateUserQuery(...args);
 // @desc    Delete user
 // @route   DELETE /api/user/:id

@@ -1,5 +1,5 @@
 import multer from "multer";
-import { insertUser } from "../Database/querys.js";
+import connection from "../Database/connection.js";
 
 const upload = multer();
 
@@ -143,18 +143,21 @@ export const getStores = (req, res, next) => {
 // @route   /api/stores/id/:id
 
 export const getStoreById = (req, res, next) => {
-  if (parseInt(req.params.id)) {
-    const id = parseInt(req.params.id);
-    const store = stores.find((store) => store.id === id);
-
-    if (!store) {
-      const err = new Error(`Store with id ${id} was not found`);
-      err.status = 404;
+  const id = parseInt(req.params.id);
+  connection.query(`CALL getStoreById(${id})`, (err, result) => {
+    if (err) {
+      err.status = 500;
       return next(err);
     }
 
-    res.status(200).json(store);
-  }
+    if (result.affectedRows === 0) {
+      const error = new Error(`Store with ID ${id} was not found`);
+      error.status = 404;
+      return next(err);
+    }
+    console.log("RESULT", result[0]);
+    res.status(200).json(result[0]);
+  });
 };
 
 // @desc    Get a store by name
