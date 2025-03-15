@@ -160,42 +160,36 @@ export const getStoreById = (req, res, next) => {
   });
 };
 
-// @desc    Get a store by name
-// @route   GET /api/stores/ :name
-
-export const getStoreByName = (req, res, next) => {
-  if (isNaN(req.params.name)) {
-    const name = req.params.name.toLowerCase();
-    const storeName = stores.filter((store) =>
-      store.name.toLowerCase().includes(name)
-    );
-    if (!storeName || storeName.length === 0) {
-      const err = new Error(` ${req.params.name} was not found`);
-      err.status = 404;
-      return next(err);
-    }
-
-    res.status(201).json(storeName);
-  }
-};
-
 // @desc    POST a store
 // @route   POST /api/stores
 export const createNewStore =
   (upload.array(),
   (req, res, next) => {
-    if (!req.body.name || !req.body.bio || !req.body.sells) {
-      const err = new Error("Please Fill all the fields");
+    // Check if request body is valid
+    if (
+      !req.body.name ||
+      !req.body.description ||
+      !req.body.store_email ||
+      !req.body.id
+    ) {
+      const err = new Error("Missing body fields");
       err.status = 400;
       return next(err);
     }
-    stores.push({
-      name: req.body.name,
-      bio: req.body.bio,
-      sells: req.body.sells,
-    });
 
-    res.status(200).json(stores);
+    connection.query(
+      `CALL createNewStore('${req.body.name}',
+    "${req.body.description}","${req.body.store_email}","${req.body.id}"
+      )`,
+      (err, result) => {
+        if (err) {
+          err.status = 500;
+          return next(err);
+        }
+
+        res.status(200).json({ msg: "Added to DB" });
+      }
+    );
   });
 
 // @desc    Update store info
