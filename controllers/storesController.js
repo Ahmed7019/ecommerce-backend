@@ -198,28 +198,28 @@ export const updateInfo =
   (upload.any(),
   (req, res, next) => {
     const id = parseInt(req.params.id);
-    const storeToUpdate = stores.find((store) => store.id === id);
-
-    // Check if the store doesn't exist
-    if (!storeToUpdate) {
-      const err = new Error(`Store with id ${id} was not fonud`);
-      err.status = 404;
-      return next(err);
+    if (!req.body.name || !req.body.description || !id) {
+      const error = new Error("Missing field");
+      error.status = 400;
+      return next(error);
     }
-    console.log(req.body);
+    connection.query(
+      `CALL updateStoreInfo("${req.body.name}","${req.body.description}",${id})`,
+      (err, result) => {
+        if (err) {
+          err.status = 500;
+          return next(err);
+        }
 
-    //   Check if one of the fields is missing
-    if (!req.body.name || !req.body.bio || !req.body.sells) {
-      const err = new Error(`Please fill all the fields`);
-      err.status = 400; // Bad request
-      return next(err);
-    }
+        if (!result || result.affectedRows === 0) {
+          const error = new Error(`Updating failed`);
+          error.status = 500;
+          return next(error);
+        }
 
-    storeToUpdate.name = req.body.name;
-    storeToUpdate.bio = req.body.bio;
-    storeToUpdate.sells = req.body.sells;
-
-    res.status(200).json(storeToUpdate);
+        res.status(200).json({ success: "Updated store successfully" });
+      }
+    );
   });
 
 // @desc    DELETE a store using id
