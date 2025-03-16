@@ -232,7 +232,11 @@ export const deleteStore = (req, res, next) => {
       err.status = 500;
       return next(err);
     }
-
+    if (result.affectedRows === 0) {
+      const error = new Error(`Store with id ${id} doesn't exist`);
+      error.status = 404;
+      return next(error);
+    }
     res.status(200).json({ msg: "Store was deleted" });
   });
 };

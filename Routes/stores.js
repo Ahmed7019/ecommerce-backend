@@ -22,5 +22,5 @@ router.post("/", createNewStore);
 router.put("/:id", updateInfo);
 
 // Delete a store
-router.delete("/id/:id", deleteStore);
+router.delete("/:id", deleteStore);
 export default router;
