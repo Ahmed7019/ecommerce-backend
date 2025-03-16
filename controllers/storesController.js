@@ -226,18 +226,13 @@ export const updateInfo =
 // @route   DELETE /api/stores/id
 
 export const deleteStore = (req, res, next) => {
-  const id = parseInt(req.params.id);
-  const storeToDelete = stores.find((store) => store.id === id);
+  const id = req.params.id;
+  connection.query(`CALL deleteStore(${id})`, (err, result) => {
+    if (err) {
+      err.status = 500;
+      return next(err);
+    }
 
-  //Handle error
-  if (!storeToDelete) {
-    const err = new Error(`Store with id ${id} was not found`);
-    err.status = 404; // Not found
-    return next(err);
-  }
-
-  // If the store was found
-  const newStores = stores.filter((store) => store.id !== id);
-
-  res.status(200).json(newStores);
+    res.status(200).json({ msg: "Store was deleted" });
+  });
 };
