@@ -7,13 +7,20 @@ const upload = multer();
 // @route   /api/stores
 
 export const getStores = (req, res, next) => {
-  if (!stores) {
-    const err = new Error(`No store was found`);
-    err.status = 404;
-    return next(err);
-  }
+  connection.query(`CALL getAllStores()`, (err, result) => {
+    if (err) {
+      err.status = 500;
+      return next(err);
+    }
 
-  res.status(200).json(stores);
+    if (result.affectedRows === 0) {
+      const error = new Error(`No store was found`);
+      error.status = 404;
+      return next(error);
+    }
+
+    res.status(200).json(result[0]);
+  });
 };
 
 // @desc    Get a store by Id
