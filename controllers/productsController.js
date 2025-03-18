@@ -120,24 +120,21 @@ export const updateProductUsingId =
     updatedProduct.name = req.body.name;
     updatedProduct.price = req.body.price;
     updatedProduct.brand = req.body.brand;
-    res.status(200).json(updatedProduct);
+    res.status(204).json(updatedProduct);
   });
 
 // @desc    delete a product by id
 // @route   DELETE /api /products/ id/ :id
 
 export const deleteProductUsingId = (req, res, next) => {
-  const id = parseInt(req.params.id);
-  const productToDelete = products.find((product) => product.id === id);
+  const id = parseInt(req.body.id);
+  connection.query(`CALL deleteProduct(${id})`, (err, result) => {
+    if (err) return next(err);
 
-  if (!productToDelete) {
-    const err = new Error(`Product with id ${id} was not found`);
-    err.status = 404;
-    next(err);
-  }
-
-  const newProducts = products.filter((product) => product.id !== id);
-  res.status(200).json(newProducts);
+    res
+      .status(200)
+      .json({ msg: `Product with ID ${id} Deleted Successfully!` });
+  });
 };
 
 // @desc    delete a product by name

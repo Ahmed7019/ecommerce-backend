@@ -28,7 +28,7 @@ router.put("/id/:id", updateProductUsingId);
 
 // Delete using ID
 
-router.delete("/id/:id", deleteProductUsingId);
+router.delete("/", deleteProductUsingId);
 
 // Delete using name
 router.delete("/:name", deleteProductUsingName);
