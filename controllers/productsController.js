@@ -2,79 +2,6 @@ import multer from "multer";
 const upload = multer();
 import connection from "../Database/connection.js";
 
-const products = [
-  {
-    id: 1,
-    name: "Wireless Bluetooth Earbuds",
-    price: 49.99,
-    brand: "TechSound",
-    url: "https://images.pexels.com/photos/20573136/pexels-photo-20573136/free-photo-of-airpod-on-mirror.jpeg?auto=compress&cs=tinysrgb&w=600",
-  },
-  {
-    id: 2,
-    name: "Portable Power Bank 10000mAh",
-    price: 29.95,
-    brand: "PowerUp",
-    url: "https://images.pexels.com/photos/16814788/pexels-photo-16814788/free-photo-of-man-charging-cellphone-with-powerbank.jpeg?auto=compress&cs=tinysrgb&w=600",
-  },
-  {
-    id: 3,
-    name: "Smartwatch Fitness Tracker",
-    price: 79.5,
-    brand: "FitLife",
-    url: "https://images.pexels.com/photos/393047/pexels-photo-393047.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-  },
-  {
-    id: 4,
-    name: "Phone Ring Light with Tripod",
-    price: 19.99,
-    url: "https://images.pexels.com/photos/3394666/pexels-photo-3394666.jpeg?auto=compress&cs=tinysrgb&w=600",
-    brand: "GlowUp",
-  },
-  {
-    id: 5,
-    name: "Laptop Sleeve 15-inch",
-    price: 24.99,
-    url: "https://images.pexels.com/photos/3394666/pexels-photo-3394666.jpeg?auto=compress&cs=tinysrgb&w=600",
-    brand: "CarryOn",
-  },
-  {
-    id: 6,
-    name: "USB-C Multiport Adapter",
-    price: 39.99,
-    url: "https://images.pexels.com/photos/3394666/pexels-photo-3394666.jpeg?auto=compress&cs=tinysrgb&w=600",
-    brand: "ConnectPro",
-  },
-  {
-    id: 7,
-    name: "Adjustable Phone Stand",
-    price: 14.5,
-    url: "https://images.pexels.com/photos/3394666/pexels-photo-3394666.jpeg?auto=compress&cs=tinysrgb&w=600",
-    brand: "ViewMaster",
-  },
-  {
-    id: 8,
-    name: "Noise-Cancelling Headphones",
-    price: 99.0,
-    brand: "AcousticWave",
-    url: "https://images.pexels.com/photos/3394666/pexels-photo-3394666.jpeg?auto=compress&cs=tinysrgb&w=600",
-  },
-  {
-    id: 9,
-    name: "Waterproof Phone Pouch",
-    price: 9.99,
-    brand: "AquaGuard",
-    url: "https://images.pexels.com/photos/393047/pexels-photo-393047.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-  },
-  {
-    id: 10,
-    name: "Camera Lens Cleaning Kit",
-    price: 12.99,
-    brand: "ClearSight",
-    url: "https://images.pexels.com/photos/393047/pexels-photo-393047.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-  },
-];
-
 // @desc    Get all products
 // @route   GET /api/products
 
@@ -138,20 +65,40 @@ export const getProductById = (req, res, next) => {
 
 export const createNewProduct =
   (upload.single(),
-  (req, res) => {
-    console.log("Request Headers:", req.headers);
-    console.log("Request Body:", req.params);
-    if (!req.body.name || !req.body.price || !req.body.brand) {
-      return res.status(404).json({ msg: "One of the fields is missing" });
+  (req, res, next) => {
+    // Check if missing one of the fields
+    const name = req.body.name,
+      description = req.body.description,
+      price = req.body.price,
+      storeId = req.body.store_id,
+      imageUrl = req.body.image_url,
+      stockQuantity = req.body.stock_quantity,
+      category = req.body.category;
+
+    if (
+      !name ||
+      !description ||
+      !price ||
+      !storeId ||
+      !imageUrl ||
+      !stockQuantity ||
+      !category
+    ) {
+      const err = new Error("Bad request : A field or more is missing");
+      err.status = 400; // Bad request
+      return next(err);
     }
 
-    products.push({
-      id: products.length + 1,
-      name: req.body.name,
-      price: req.body.price,
-      brand: req.body.brand,
-    });
-    res.status(200).json(products);
+    // If no bad request add product to database
+    connection.query(
+      `CALL createNewProduct("${name}",${storeId},"${description}",${price},${stockQuantity},"${imageUrl}","${category}")`,
+      (err, result) => {
+        if (err) {
+          return next(err);
+        }
+        res.status(200).json({ success: "Product added successfullt" });
+      }
+    );
   });
 
 // @desc    update a product by id
