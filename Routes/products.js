@@ -6,7 +6,6 @@ import {
   createNewProduct,
   updateProductUsingId,
   deleteProductUsingId,
-  deleteProductUsingName,
 } from "../controllers/productsController.js";
 const router = express.Router();
 
@@ -24,13 +23,10 @@ router.post("/", createNewProduct);
 
 // Update a product
 
-router.put("/id/:id", updateProductUsingId);
+router.put("/", updateProductUsingId);
 
 // Delete using ID
 
 router.delete("/", deleteProductUsingId);
-
-// Delete using name
-router.delete("/:name", deleteProductUsingName);
 
 export default router;

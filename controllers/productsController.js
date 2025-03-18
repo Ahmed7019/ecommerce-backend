@@ -106,21 +106,34 @@ export const createNewProduct =
 
 export const updateProductUsingId =
   (upload.array(),
-  (req, res) => {
-    const id = parseInt(req.params.id);
-    const updatedProduct = products.find((product) => product.id === id);
-
-    if (!updatedProduct) {
-      return res.status(404).json({ msg: "The product was not found" });
+  (req, res, next) => {
+    const name = req.body.name,
+      description = req.body.description,
+      price = req.body.price,
+      productId = req.body.product_id,
+      imageUrl = req.body.image_url,
+      stockQuantity = req.body.stock_quantity;
+    if (
+      !name ||
+      !description ||
+      !price ||
+      !productId ||
+      !imageUrl ||
+      !stockQuantity
+    ) {
+      const err = new Error("Bad request : A field or more is missing");
+      err.status = 400; // Bad request
+      return next(err);
     }
-    if (!req.body.name || !req.body.price || !req.body.brand) {
-      return res.status(404).json({ msg: "One of the fields is missing" });
-    }
 
-    updatedProduct.name = req.body.name;
-    updatedProduct.price = req.body.price;
-    updatedProduct.brand = req.body.brand;
-    res.status(204).json(updatedProduct);
+    connection.query(
+      `CALL updateProduct(${productId},"${name}","${description}",${price},${stockQuantity},"${imageUrl}")`,
+      (err, result) => {
+        if (err) return next(err);
+
+        res.status(200).json({ msg: "Update Successfully!" });
+      }
+    );
   });
 
 // @desc    delete a product by id
@@ -135,25 +148,4 @@ export const deleteProductUsingId = (req, res, next) => {
       .status(200)
       .json({ msg: `Product with ID ${id} Deleted Successfully!` });
   });
-};
-
-// @desc    delete a product by name
-// @route   DELETE /api /products/ :name
-
-export const deleteProductUsingName = (req, res) => {
-  const name = req.params.name.toLowerCase();
-  const product = products.find((product) =>
-    product.name.toLowerCase().includes(name)
-  );
-
-  if (!product) {
-    return res
-      .status(404)
-      .json({ msg: `product with name ${req.params.name} was not found` });
-  }
-
-  const newProducts = products.filter(
-    (product) => !product.name.toLowerCase().includes(name)
-  );
-  res.status(200).json(newProducts);
 };
