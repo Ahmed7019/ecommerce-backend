@@ -1,5 +1,6 @@
 import multer from "multer";
 const upload = multer();
+import connection from "../Database/connection.js";
 
 const products = [
   {
@@ -78,34 +79,40 @@ const products = [
 // @route   GET /api/products
 
 export const getProducts = (req, res, next) => {
-  if (!products.length || !products) {
-    const err = new Error(`No product was found`);
-    err.status = 404;
-    return next(err);
-  }
-  res.status(200).json(products);
+  connection.query(`CALL getAllProducts()`, (err, result) => {
+    if (err) {
+      err.status = 500;
+      return next(err);
+    }
+
+    res.status(200).json(result[0]);
+  });
 };
 
 // @desc    Get a product by name
 // @route   GET /api /products /:name
 
 export const getProductByName = (req, res, next) => {
-  if (isNaN(req.params.name)) {
-    const name = req.params.name.toLowerCase();
-    const productName = products.filter((product) =>
-      product.name.toLowerCase().includes(name)
-    );
-    if (!productName || productName.length === 0) {
-      const err = new Error(
-        `product with name ${req.params.name} was not found`
-      );
-
-      err.status = 404;
+  const product = req.params.name;
+  if (!product) {
+    const err = new Error(`Bad request`);
+    err.status = 400;
+    return next(err);
+  }
+  connection.query(`CALL getProductByName("${product}")`, (err, result) => {
+    if (err) {
+      err.status = 500;
       return next(err);
     }
 
-    res.status(201).json(productName);
-  }
+    if (result.affectedRows === 0) {
+      const error = new Error("Not found");
+      error.status = 404;
+      return next(error);
+    }
+
+    res.status(200).json(result[0]);
+  });
 };
 
 // @desc    Get a product by id
