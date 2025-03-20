@@ -62,4 +62,28 @@ export const updateUserRole = (req, res, next) => {
 };
 // @desc    Delete user
 // @route   DELETE /api/user/:id
-export const deleteUser = (...args) => deleteUserQuery(...args);
+export const deleteUser = (req, res, next) => {
+  const { uid } = req.params;
+  const id = parseInt(uid);
+
+  // Validate id
+  if (isNaN(id)) {
+    const err = new Error(`Invalid id`);
+    err.status = 400; //bad request
+    return next(err);
+  }
+  connection.query(`CALL deleteUser(?)`, [id], (err, result) => {
+    if (err) {
+      return next(err);
+    }
+    // Check if the user exist
+    if (result.affectedRows === 0) {
+      const error = new Error(`User with ID ${id} doesn't exist`);
+      error.status = 404;
+      return next(error);
+    }
+
+    // If the user is deleted successfully
+    res.status(200).json({ success: "User deleted successfully" });
+  });
+};

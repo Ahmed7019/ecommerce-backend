@@ -21,5 +21,5 @@ router.put("/update-profile", updateUser);
 router.put("/update-role", updateUserRole);
 
 // @desc delte a user
-router.delete("/:id", deleteUser);
+router.delete("/:uid", deleteUser);
 export default router;
