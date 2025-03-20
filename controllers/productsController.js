@@ -46,18 +46,26 @@ export const getProductByName = (req, res, next) => {
 // @route   GET /api /products /id /:id
 
 export const getProductById = (req, res, next) => {
-  if (parseInt(req.params.id)) {
-    const id = parseInt(req.params.id);
-    const product = products.find((product) => product.id === id);
+  const id = parseInt(req.params.id);
+  if (!id) {
+    const error = new Error(
+      `Bad request : request body doesn't have a product id`
+    );
+    error.status = 400;
+    return next(error);
+  }
 
-    if (!product) {
-      const error = new Error(`product with id ${id} was not found`);
+  connection.query(`CALL getProductById(${id})`, (err, result) => {
+    if (err) return next(err);
+
+    if (result[0].length === 0) {
+      const error = new Error(`Product with ID ${id} doesn't exist`);
       error.status = 404;
       return next(error);
     }
 
-    res.status(201).json(product);
-  }
+    res.status(200).json(result[0]);
+  });
 };
 
 // @desc    create a product by id
