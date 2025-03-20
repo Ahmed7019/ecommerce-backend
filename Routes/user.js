@@ -2,7 +2,7 @@ import express from "express";
 import {
   createNewUser,
   deleteUser,
-  getUser,
+  getUserById,
   updateUser,
   updateUserRole,
 } from "../controllers/usersController.js";
@@ -10,7 +10,7 @@ import {
 const router = express.Router();
 
 // @desc GET using id
-router.get("/:id", getUser);
+router.get("/:uid", getUserById);
 
 // @desc Create a product
 router.post("/", createNewUser);

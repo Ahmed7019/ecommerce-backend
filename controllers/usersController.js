@@ -1,8 +1,5 @@
 import connection from "../Database/connection.js";
 import {
-  deleteUserQuery,
-  getUserQuery,
-  insertUser,
   updateUserQuery,
 } from "../Database/userQuerys.js";
 import multer from "multer";
@@ -13,7 +10,28 @@ const upload = multer();
 
 // @desc    Get the user using id
 // @route   GET /api/user/id
-export const getUser = (req, res, next) => getUserQuery(req, res, next);
+export const getUserById = (req, res, next) => {
+  const { uid } = req.params;
+  const id = parseInt(uid);
+
+  if (isNaN(id)) {
+    const err = new Error("Invalid id");
+    err.status = 400;
+    return next(err);
+  }
+
+  connection.query("CALL getUserById(?)", [id], (err, result) => {
+    if (err) return err;
+
+    if (result.affectedRows === 0) {
+      const error = new Error(`User with id ${id} doesn't exist`);
+      error.status = 404;
+      return next(error);
+    }
+
+    res.status(200).json(result[0]);
+  });
+};
 
 // @desc    Create a new user
 // @route   POST /api/ user
@@ -29,10 +47,8 @@ export const createNewUser =
     }
     const hashedPassword = await bcrypt.hash(password, 13);
     connection.query(
-      `CALL createUser("${name}",
-      "${email}",
-      "${hashedPassword}"
-      )`,
+      `CALL createUser(?,?,?)`,
+      [name, email, hashedPassword],
       (err, result) => {
         if (err) return next(err);
 
