@@ -1,7 +1,4 @@
 import connection from "../Database/connection.js";
-import {
-  updateUserQuery,
-} from "../Database/userQuerys.js";
 import multer from "multer";
 
 import bcrypt from "bcrypt";
@@ -60,7 +57,34 @@ export const createNewUser =
 //  @desc     Update an existing user
 //  @route    PUT  / api/user/:id
 
-export const updateUser = (...args) => updateUserQuery(...args);
+export const updateUser = async (req, res, next) => {
+  const { uid, name, password, phone } = req.body;
+
+  if (!uid || !name || !password || !phone) {
+    const error = new Error("Missing fields");
+    error.status = 400;
+    return next(error);
+  }
+  const hash = await bcrypt.hash(password, 10);
+
+  connection.query(
+    `
+    CALL updateUser(?,?,?,?)
+    `,
+    [uid, name, hash, phone],
+    (err, result) => {
+      if (err) {
+        return next(err);
+      }
+      if (result.affectedRows === 0) {
+        const error = new Error(`wrong id`);
+        error.status = 404;
+        return next(error);
+      }
+      res.status(200).json({ msg: "User updated successfully" });
+    }
+  );
+};
 
 export const updateUserRole = (req, res, next) => {
   const { uid, role } = req.body;
