@@ -1,3 +1,4 @@
+import connection from "../Database/connection.js";
 import {
   deleteUserQuery,
   getUserQuery,
@@ -5,6 +6,8 @@ import {
   updateUserQuery,
 } from "../Database/userQuerys.js";
 import multer from "multer";
+
+import bcrypt from "bcrypt";
 
 const upload = multer();
 
@@ -16,20 +19,26 @@ export const getUser = (req, res, next) => getUserQuery(req, res, next);
 // @route   POST /api/ user
 export const createNewUser =
   (upload.array(),
-  (req, res, next) => {
-    if (
-      !req.body.name ||
-      !req.body.email ||
-      !req.body.pwd ||
-      !req.body.phone ||
-      !req.body.role
-    ) {
+  async (req, res, next) => {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
       const err = new Error(`One or more field is missing`);
-      err.status = 404;
+      err.status = 400;
       return next(err);
     }
+    const hashedPassword = await bcrypt.hash(password, 13);
+    connection.query(
+      `CALL createUser("${name}",
+      "${email}",
+      "${hashedPassword}"
+      )`,
+      (err, result) => {
+        if (err) return next(err);
 
-    insertUser(req.body, res, next);
+        res.status(201).json({ msg: "User added successfully !" });
+      }
+    );
   });
 
 //  @desc     Update an existing user
