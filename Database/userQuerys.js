@@ -1,5 +1,5 @@
 import connection from "./connection.js";
-
+import bcrypt from "bcrypt";
 // Insert user
 export const insertUser = (user, res, next) => {
   // Accepts user information [name,email,pwd,phone,role]
@@ -37,30 +37,26 @@ export const getUserQuery = (req, res, next) => {
 };
 
 // @desc update user information
-export const updateUserQuery = (req, res, next) => {
-  const id = req.params.id;
-  const name = req.body.name;
-  const password = req.body.pwd;
-  if (!name || !password) {
-    const error = new Error(`Please fill all the fields`);
+export const updateUserQuery = async (req, res, next) => {
+  const { uid, name, password, phone } = req.body;
+
+  if (!uid || !name || !password || !phone) {
+    const error = new Error("Missing fields");
     error.status = 400;
     return next(error);
   }
+  const hash = await bcrypt.hash(password, 10);
 
   connection.query(
-    `UPDATE users 
-    SET name = "${name}",
-    password_hash = "${password}"
-    WHERE user_id = "${id}"
+    `
+    CALL updateUser(${uid},"${name}","${hash}",${phone})
     `,
     (err, result) => {
       if (err) {
-        err.status = 500;
         return next(err);
       }
-      console.log(result);
       if (result.affectedRows === 0) {
-        const error = new Error(`User with ID ${id} doesn't exist`);
+        const error = new Error(`wrong id`);
         error.status = 404;
         return next(error);
       }

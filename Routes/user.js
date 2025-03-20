@@ -8,9 +8,6 @@ import {
 
 const router = express.Router();
 
-// @desc GET all users
-// router.get("/", getProducts);
-
 // @desc GET using id
 router.get("/:id", getUser);
 
@@ -18,7 +15,7 @@ router.get("/:id", getUser);
 router.post("/", createNewUser);
 
 // @desc Update a user
-router.put("/:id", updateUser);
+router.put("/update-profile", updateUser);
 
 // @desc delte a user
 router.delete("/:id", deleteUser);
