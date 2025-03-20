@@ -45,6 +45,21 @@ export const createNewUser =
 //  @route    PUT  / api/user/:id
 
 export const updateUser = (...args) => updateUserQuery(...args);
+
+export const updateUserRole = (req, res, next) => {
+  const { uid, role } = req.body;
+
+  if (!uid || !role) {
+    const err = new Error("Bad request");
+    err.status = 400;
+    return next(err);
+  }
+
+  connection.query(`CALL updateUserRole(${uid},"${role}")`, (err, result) => {
+    if (err) return next(err);
+    res.status(200).json({ msg: "Update successfully !" });
+  });
+};
 // @desc    Delete user
 // @route   DELETE /api/user/:id
 export const deleteUser = (...args) => deleteUserQuery(...args);

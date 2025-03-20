@@ -4,6 +4,7 @@ import {
   deleteUser,
   getUser,
   updateUser,
+  updateUserRole,
 } from "../controllers/usersController.js";
 
 const router = express.Router();
@@ -14,8 +15,10 @@ router.get("/:id", getUser);
 // @desc Create a product
 router.post("/", createNewUser);
 
-// @desc Update a user
+// @desc Update user info
 router.put("/update-profile", updateUser);
+
+router.put("/update-role", updateUserRole);
 
 // @desc delte a user
 router.delete("/:id", deleteUser);
