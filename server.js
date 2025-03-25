@@ -4,12 +4,12 @@ import cors from "cors";
 import products from "./Routes/products.js";
 import stores from "./Routes/stores.js";
 import user from "./Routes/user.js";
+import authRoute from "./Routes/authRoute.js";
 
 import bodyParser from "body-parser";
 import logger from "./middleware/logger.js";
 import errorHandler from "./middleware/error.js";
 import notFound from "./middleware/notFound.js";
-
 import connection from "./Database/connection.js";
 
 const PORT = process.env.PORT || 8080;
@@ -28,6 +28,7 @@ app.use(logger);
 app.use("/api/products", products);
 app.use("/api/stores", stores);
 app.use("/api/user", user);
+app.use("/auth/login", authRoute);
 
 // Error handler
 app.use(notFound);

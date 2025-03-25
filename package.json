@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/Ahmed7019/ecommerce-backend.git"
   },
-  "author": "",
+  "author": "Ahmed Abdalla",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Ahmed7019/ecommerce-backend/issues"
@@ -25,6 +25,7 @@
     "colors": "^1.4.0",
     "cors": "^2.8.5",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.13.0"
   }
