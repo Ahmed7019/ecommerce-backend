@@ -1,14 +1,13 @@
 import express from "express";
-import AuthService from "../service/authService.js";
 import authMiddleware from "../middleware/authMiddleware.js";
+import { authenticateUser, register } from "../controllers/authController.js";
 const router = express.Router();
 
-router.post("/", (req, res) => {
-  const { email, name, role } = req.body;
-  const user = { email: email, username: name, role: role };
-  const accessToken = AuthService.generateToken(user);
-  res.json({ accessToken: accessToken });
-});
+// @desc authenticate user
+router.post("/", authenticateUser);
+
+// @desc register
+router.post("/register", register);
 
 router.get("/", authMiddleware, (req, res) => {
   const user = {

@@ -32,27 +32,6 @@ export const getUserById = (req, res, next) => {
 
 // @desc    Create a new user
 // @route   POST /api/ user
-export const createNewUser =
-  (upload.array(),
-  async (req, res, next) => {
-    const { name, email, password } = req.body;
-
-    if (!name || !email || !password) {
-      const err = new Error(`One or more field is missing`);
-      err.status = 400;
-      return next(err);
-    }
-    const hashedPassword = await bcrypt.hash(password, 13);
-    connection.query(
-      `CALL createUser(?,?,?)`,
-      [name, email, hashedPassword],
-      (err, result) => {
-        if (err) return next(err);
-
-        res.status(201).json({ msg: "User added successfully !" });
-      }
-    );
-  });
 
 //  @desc     Update an existing user
 //  @route    PUT  / api/user/:id

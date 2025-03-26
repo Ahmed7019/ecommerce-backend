@@ -10,7 +10,7 @@ const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 
 class AuthService {
   static hashPassword(password) {
-    return bcrypt.hash(password, 10);
+    return bcrypt.hash(password, 13);
   }
 
   static comparePassword(password, hashedPassword) {

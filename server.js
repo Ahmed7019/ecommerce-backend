@@ -28,7 +28,7 @@ app.use(logger);
 app.use("/api/products", products);
 app.use("/api/stores", stores);
 app.use("/api/user", user);
-app.use("/auth/login", authRoute);
+app.use("/auth", authRoute);
 
 // Error handler
 app.use(notFound);
