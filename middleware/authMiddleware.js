@@ -10,7 +10,6 @@ const authMiddleware = async (req, res, next) => {
 
   try {
     const decoded = AuthService.verifyToken(token);
-    console.log(decoded);
     req.user = decoded;
     next();
   } catch (err) {

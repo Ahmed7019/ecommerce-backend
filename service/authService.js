@@ -1,12 +1,8 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
-// authToken = (req, res, next) => {
-//   const authHeader = req.headers["authorization"];
-//   const token = authHeader && authHeader.split(" ")[1];
-//   if (token == null) return res.status(401).json({ msg: " Access Denied " });
+import connection from "../Database/connection.js";
 
-// };
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 
 class AuthService {
   static hashPassword(password) {
@@ -25,6 +21,29 @@ class AuthService {
 
   static verifyToken(token) {
     return jwt.verify(token, ACCESS_TOKEN_SECRET);
+  }
+
+  static async loginUser(payload, password) {
+    const hashedPassword = await payload.password_hash;
+    const isMatch = await this.comparePassword(password, hashedPassword);
+
+    // If password is wrong throw an error
+    if (!isMatch) {
+      throw new Error("Invalid credentials");
+    }
+
+    const user = {
+      uid: payload.user_id,
+      name: payload.name,
+      email: payload.email,
+      role: payload.role,
+    };
+
+    // If the passwords matches generate access token
+    const token = this.generateToken(user);
+    return {
+      accessToken: token,
+    };
   }
 }
 

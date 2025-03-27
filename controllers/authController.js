@@ -30,4 +30,30 @@ export const register =
         res.status(201).json({ msg: "User created successfully !" });
       }
     );
+    next();
   });
+
+export const login = async (req, res, next) => {
+  const { email, password } = req.body;
+  try {
+    connection.query(`CALL authUser(?)`, [email], (err, result) => {
+      if (err) return err;
+
+      if (result[0].length === 0) {
+        const error = new Error("Invalid email or password");
+        error.status = 401;
+        return next(error);
+      }
+      console.log(payload);
+      const payload = result.flat()[0];
+      const user = AuthService.loginUser(payload, password);
+      user.then((data) => res.status(200).json(data));
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
+  // const user = await AuthService.loginUser(email, password);
+  //   throw new Error(error);
+  //   res.status(500).json({ msg: "error" });
+};
