@@ -14,7 +14,6 @@ export const register =
   (upload.array(),
   async (req, res, next) => {
     const { name, email, password } = req.body;
-
     if (!name || !email || !password) {
       const err = new Error(`One or more field is missing`);
       err.status = 400;
@@ -27,10 +26,9 @@ export const register =
       [name, email, hashedPassword],
       (err, result) => {
         if (err) return next(err);
-        res.status(201).json({ msg: "User created successfully !" });
+        res.status(200).json({ msg: "User created successfully !" });
       }
     );
-    next();
   });
 
 export const login = async (req, res, next) => {
