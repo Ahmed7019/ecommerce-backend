@@ -11,6 +11,7 @@ import logger from "./middleware/logger.js";
 import errorHandler from "./middleware/error.js";
 import notFound from "./middleware/notFound.js";
 import connection from "./Database/connection.js";
+import cookieParser from "cookie-parser";
 
 const PORT = process.env.PORT || 8080;
 
@@ -20,6 +21,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
 
 // Middelware
 app.use(logger);

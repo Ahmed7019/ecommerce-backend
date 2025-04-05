@@ -4,10 +4,12 @@ import {
   authenticateUser,
   register,
   login,
+  refreshToken,
 } from "../controllers/authController.js";
 const router = express.Router();
 import multer from "multer";
 const upload = multer();
+
 
 // @desc authenticate user
 router.post("/", authenticateUser);
@@ -28,4 +30,6 @@ router.get("/", authMiddleware, (req, res) => {
   res.json(user);
 });
 
+// @desc refresh the token if expired
+router.post("/token", refreshToken);
 export default router;

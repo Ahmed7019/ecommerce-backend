@@ -3,6 +3,8 @@ import multer from "multer";
 import connection from "../Database/connection.js";
 const upload = multer();
 
+let refreshTokens = [];
+
 export const authenticateUser = (req, res) => {
   const { email, name, role } = req.body;
   const user = { email: email, username: name, role: role };
@@ -44,13 +46,22 @@ export const login = async (req, res, next) => {
       }
       const payload = result.flat()[0];
       const user = AuthService.loginUser(payload, password);
-      user.then((data) => res.status(200).json(data));
+      if (!user) console.log("error with user");
+
+      user.then((data) => {
+        res.status(200).json(data);
+      });
     });
   } catch (error) {
     console.log(error);
   }
+};
 
-  // const user = await AuthService.loginUser(email, password);
-  //   throw new Error(error);
-  //   res.status(500).json({ msg: "error" });
+export const refreshToken = (req, res) => {
+  const accessToken = req.body.token;
+  if (accessToken == null) res.status(401);
+  const verified = AuthService.verifyAccessToken(accessToken);
+  if (!verified) res.status(401).json({ msg: "Unauthorized" });
+
+  res.status(200).json({ token: accessToken });
 };
