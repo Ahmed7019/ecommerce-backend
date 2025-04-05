@@ -10,7 +10,6 @@ const router = express.Router();
 import multer from "multer";
 const upload = multer();
 
-
 // @desc authenticate user
 router.post("/", authenticateUser);
 
@@ -22,7 +21,7 @@ router.post("/login", login);
 
 router.get("/", authMiddleware, (req, res) => {
   const user = {
-    uid: req.user.id,
+    uid: req.user.uid,
     name: req.user.name,
     email: req.user.email,
     role: req.user.role,

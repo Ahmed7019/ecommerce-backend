@@ -59,34 +59,26 @@ class AuthService {
     }
 
     const uid = payload.user_id;
-    const user = {
-      uid: payload.user_id,
-      name: payload.name,
-      email: payload.email,
-      role: payload.role,
-    };
-    connection.query(`CALL getToken(?)`, [uid], (err, result) => {
-      // Check if their is an existing refresh token
 
-      if (err) return err;
+    return new Promise((resolve, reject) => {
+      connection.query(`CALL getToken(?)`, [uid], (err, result) => {
+        // Check if their is an existing refresh token
 
-      if (result.affectedRows === 0) {
-        // If the refresh token doesn't exist (The user signed for the first time (if false) => create a new refresh token)
-        console.log("HELLO");
-        const refreshToken = this.generateRefreshToken(user);
-        connection.query(`CALL insertToken(?,?)`, [uid, refreshToken]);
-        const accessToken = this.generateAccessToken(user);
-        return accessToken;
-      }
+        if (err) return reject(err);
+        if (result[0].length === 0) {
+          // If the refresh token doesn't exist (The user signed for the first time (if false) => create a new refresh token)
+          const refreshToken = this.generateRefreshToken(user);
+          connection.query(`CALL insertToken(?,?)`, [uid, refreshToken]);
+          const accessToken = this.generateAccessToken(user);
+          return resolve({ accessToken: accessToken });
+        }
 
-      const token = result.flat()[0].token;
-      // If the refresh token exists check if it's valid , (if true) => generate new access token
+        const token = result.flat()[0].token;
+        // If the refresh token exists check if it's valid , (if true) => generate new access token
 
-      const newToken = jwt.verify(
-        token,
-        process.env.REFRESH_TOKEN_SECRET,
-        (err, result) => {
-          if (err) return err;
+        jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, result) => {
+          if (err) return reject(err);
+          console.log(result);
           const user = {
             uid: result.uid,
             name: result.name,
@@ -94,12 +86,9 @@ class AuthService {
             role: result.role,
           };
           const accessToken = this.generateAccessToken(user);
-          return {
-            accessToken: accessToken,
-          };
-        }
-      );
-      return newToken;
+          return resolve({ accessToken: accessToken });
+        });
+      });
     });
   }
 }
