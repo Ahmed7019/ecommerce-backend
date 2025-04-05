@@ -60,6 +60,7 @@ class AuthService {
 
     const uid = payload.user_id;
 
+    // Authorization & jwt
     return new Promise((resolve, reject) => {
       const user = {
         uid: payload.user_id,
@@ -67,11 +68,11 @@ class AuthService {
         email: payload.email,
         role: payload.role,
       };
-      connection.query(`CALL getToken(?)`, [uid], (err, result) => {
-        // Check if their is an existing refresh token
 
+      // Check if their is an existing refresh token
+      connection.query(`CALL getToken(?)`, [uid], (err, result) => {
         if (err) return reject(err);
-        if (result[0].length === 0) {
+        if (!result.flat()[0].token) { // check if the refresh token exists
           // If the refresh token doesn't exist (The user signed for the first time (if false) => create a new refresh token)
           const refreshToken = this.generateRefreshToken(user);
           connection.query(`CALL insertToken(?,?)`, [uid, refreshToken]);

@@ -48,7 +48,6 @@ export const login = async (req, res, next) => {
       const user = AuthService.loginUser(payload, password);
       if (!user) console.log("error with user");
       user.then((data) => {
-        console.log(data);
         res.status(200).json(data);
       });
     });
