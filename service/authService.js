@@ -61,6 +61,12 @@ class AuthService {
     const uid = payload.user_id;
 
     return new Promise((resolve, reject) => {
+      const user = {
+        uid: payload.user_id,
+        name: payload.name,
+        email: payload.email,
+        role: payload.role,
+      };
       connection.query(`CALL getToken(?)`, [uid], (err, result) => {
         // Check if their is an existing refresh token
 
@@ -78,13 +84,6 @@ class AuthService {
 
         jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, result) => {
           if (err) return reject(err);
-          console.log(result);
-          const user = {
-            uid: result.uid,
-            name: result.name,
-            email: result.email,
-            role: result.role,
-          };
           const accessToken = this.generateAccessToken(user);
           return resolve({ accessToken: accessToken });
         });
