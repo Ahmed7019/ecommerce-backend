@@ -72,7 +72,8 @@ class AuthService {
       // Check if their is an existing refresh token
       connection.query(`CALL getToken(?)`, [uid], (err, result) => {
         if (err) return reject(err);
-        if (!result.flat()[0].token) { // check if the refresh token exists
+        if (!result.flat()[0].token) {
+          // check if the refresh token exists
           // If the refresh token doesn't exist (The user signed for the first time (if false) => create a new refresh token)
           const refreshToken = this.generateRefreshToken(user);
           connection.query(`CALL insertToken(?,?)`, [uid, refreshToken]);
@@ -84,7 +85,15 @@ class AuthService {
         // If the refresh token exists check if it's valid , (if true) => generate new access token
 
         jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, result) => {
-          if (err) return reject(err);
+          // If the refresh token is expired delete it from db and create new refresh token
+          if (err) {
+            
+            connection.query(`CALL deleteToken(?)`, [uid]);
+            const refreshToken = this.generateRefreshToken(user);
+            connection.query(`CALL insertToken(?,?)`, [uid, refreshToken]);
+            const accessToken = this.generateAccessToken(user);
+            return resolve({ accessToken: accessToken });
+          }
           const accessToken = this.generateAccessToken(user);
           return resolve({ accessToken: accessToken });
         });
