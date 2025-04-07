@@ -26,8 +26,38 @@ class AuthService {
     });
   }
 
-  static verifyAccessToken(token) {
-    return jwt.verify(token, ACCESS_TOKEN_SECRET);
+  static async verifyAccessToken(id, token) {
+    // If the token is expired check for the user refresh token
+
+    try {
+      if (!token) throw new Error("Token not provided");
+      const verifiedToken = jwt.verify(token, ACCESS_TOKEN_SECRET);
+      const user = {
+        uid: verifiedToken.uid,
+        name: verifiedToken.name,
+        email: verifiedToken.email,
+        role: verifiedToken.role,
+      };
+      return user;
+    } catch (error) {
+      if (error.name === "TokenExpiredError") {
+        connection.query(`CALL getToken(?)`, [id], (err, result) => {
+          if (err || !result.flat()[0].token) return { token: null };
+          const token = result.flat()[0].token;
+          const verifyToken = this.verifyRefreshToken(token);
+          if (!verifyToken) return { token: null };
+
+          const user = {
+            id: verifyToken.id,
+            name: verifyToken.name,
+            email: verifyToken.email,
+            role: verifyToken.role,
+          };
+          return this.generateAccessToken(user);
+        });
+      }
+      throw error;
+    }
   }
 
   static verifyRefreshToken(token) {
@@ -87,7 +117,6 @@ class AuthService {
         jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, result) => {
           // If the refresh token is expired delete it from db and create new refresh token
           if (err) {
-            
             connection.query(`CALL deleteToken(?)`, [uid]);
             const refreshToken = this.generateRefreshToken(user);
             connection.query(`CALL insertToken(?,?)`, [uid, refreshToken]);

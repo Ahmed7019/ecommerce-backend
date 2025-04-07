@@ -8,7 +8,7 @@ let refreshTokens = [];
 export const authenticateUser = (req, res) => {
   const { email, name, role } = req.body;
   const user = { email: email, username: name, role: role };
-  const accessToken = AuthService.generateToken(user);
+  const accessToken = AuthService.generateAccessToken(user);
   res.json({ accessToken: accessToken });
 };
 
@@ -56,11 +56,15 @@ export const login = async (req, res, next) => {
   }
 };
 
-export const refreshToken = (req, res) => {
-  const accessToken = req.body.token;
-  if (accessToken == null) res.status(401);
-  const verified = AuthService.verifyAccessToken(accessToken);
-  if (!verified) res.status(401).json({ msg: "Unauthorized" });
+export const refreshToken = async (req, res) => {
+  const authHeader = req.headers["authorization"];
+  const accessToken = authHeader && authHeader.split(" ")[1];
+  console.log(accessToken);
+  const uid = req.body.uid;
+  if (accessToken == null)
+    return res.status(400).json({ msg: "Access Denied !" });
+  const verified = await AuthService.verifyAccessToken(uid, accessToken);
+  if (!verified) return res.status(401).json({ msg: "Unauthorized" });
 
   res.status(200).json({ token: accessToken });
 };
