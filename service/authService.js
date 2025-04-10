@@ -22,40 +22,57 @@ class AuthService {
 
   static generateRefreshToken(payload) {
     return jwt.sign(payload, REFRESH_TOKEN_SECRET, {
-      expiresIn: "1d",
+      expiresIn: "7d",
     });
   }
 
   static async verifyAccessToken(id, token) {
-    // If the token is expired check for the user refresh token
+    if (!token) throw new Error("Token not provided");
 
     try {
-      if (!token) throw new Error("Token not provided");
+      // 1. Verify the access token
       const verifiedToken = jwt.verify(token, ACCESS_TOKEN_SECRET);
-      const user = {
+      return {
         uid: verifiedToken.uid,
         name: verifiedToken.name,
         email: verifiedToken.email,
         role: verifiedToken.role,
       };
-      return user;
     } catch (error) {
+      // 2. Handle token expiration
       if (error.name === "TokenExpiredError") {
-        connection.query(`CALL getToken(?)`, [id], (err, result) => {
-          if (err || !result.flat()[0].token) return { token: null };
-          const token = result.flat()[0].token;
-          const verifyToken = this.verifyRefreshToken(token);
-          if (!verifyToken) return { token: null };
+        try {
+          // 3. Get refresh token from DB (promisified)
+          const [results] = await connection
+            .promise()
+            .query(`CALL getToken(?)`, [id]);
+          const dbToken = results.flat()[0]?.token;
 
+          if (!dbToken) throw new Error("No refresh token found");
+
+          // 4. Verify refresh token
+          const refreshTokenData = this.verifyRefreshToken(dbToken);
+          if (!refreshTokenData) throw new Error("Invalid refresh token");
+
+          // 5. Generate new access token
           const user = {
-            id: verifyToken.id,
-            name: verifyToken.name,
-            email: verifyToken.email,
-            role: verifyToken.role,
+            id: refreshTokenData.id,
+            name: refreshTokenData.name,
+            email: refreshTokenData.email,
+            role: refreshTokenData.role,
           };
-          return this.generateAccessToken(user);
-        });
+
+          const newAccessToken = this.generateAccessToken(user);
+          return {
+            user,
+            newAccessToken,
+            isRefreshed: true,
+          };
+        } catch (refreshError) {
+          throw new Error(`Token refresh failed: ${refreshError.message}`);
+        }
       }
+      // 6. Re-throw other JWT errors (invalid signature, etc)
       throw error;
     }
   }

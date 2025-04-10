@@ -3,8 +3,6 @@ import multer from "multer";
 import connection from "../Database/connection.js";
 const upload = multer();
 
-let refreshTokens = [];
-
 export const authenticateUser = (req, res) => {
   const { email, name, role } = req.body;
   const user = { email: email, username: name, role: role };
@@ -64,7 +62,31 @@ export const refreshToken = async (req, res) => {
   if (accessToken == null)
     return res.status(400).json({ msg: "Access Denied !" });
   const verified = await AuthService.verifyAccessToken(uid, accessToken);
-  if (!verified) return res.status(401).json({ msg: "Unauthorized" });
+  if (!verified) {
+    try {
+      const refreshToken = connection.query(`CALL getToken(?)`, [uid]);
+      if (refreshToken) {
+        const verifyRefreshToken = AuthService.verifyRefreshToken(refreshToken);
+        if (verifyRefreshToken) {
+          const result = connection.query(`CALL getUserById(?)`, [uid]);
+          if (result[0]) {
+            const payload = result.flat()[0];
+            const user = {
+              uid: uid,
+              name: payload.name,
+              email: payload.email,
+              role: payload.role,
+            };
+
+            const newAccessToken = AuthService.generateAccessToken(user);
+            return res.status(200).json({ token: newAccessToken });
+          }
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   res.status(200).json({ token: accessToken });
 };
