@@ -57,7 +57,6 @@ export const login = async (req, res, next) => {
 export const refreshToken = async (req, res) => {
   const authHeader = req.headers["authorization"];
   const accessToken = authHeader && authHeader.split(" ")[1];
-  console.log(accessToken);
   const uid = req.body.uid;
   if (accessToken == null)
     return res.status(400).json({ msg: "Access Denied !" });

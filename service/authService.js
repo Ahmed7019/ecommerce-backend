@@ -27,19 +27,18 @@ class AuthService {
   }
 
   static async verifyAccessToken(id, token) {
-    if (!token) throw new Error("Token not provided");
-
+    // If the token is expired check for the user refresh token
     try {
-      // 1. Verify the access token
+      if (!token) throw new Error("Token not provided");
       const verifiedToken = jwt.verify(token, ACCESS_TOKEN_SECRET);
-      return {
+      const user = {
         uid: verifiedToken.uid,
         name: verifiedToken.name,
         email: verifiedToken.email,
         role: verifiedToken.role,
       };
+      return user;
     } catch (error) {
-      // 2. Handle token expiration
       if (error.name === "TokenExpiredError") {
         try {
           // 3. Get refresh token from DB (promisified)
@@ -52,8 +51,8 @@ class AuthService {
 
           // 4. Verify refresh token
           const refreshTokenData = this.verifyRefreshToken(dbToken);
-          if (!refreshTokenData) throw new Error("Invalid refresh token");
 
+          if (!refreshTokenData) throw new Error("Invalid refresh token");
           // 5. Generate new access token
           const user = {
             id: refreshTokenData.id,
@@ -72,8 +71,6 @@ class AuthService {
           throw new Error(`Token refresh failed: ${refreshError.message}`);
         }
       }
-      // 6. Re-throw other JWT errors (invalid signature, etc)
-      throw error;
     }
   }
 
