@@ -1,17 +1,19 @@
 import AuthService from "../service/authService.js";
 
 const authMiddleware = async (req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
+  const authHeader = req.headers.authorization;
+
   const id = req.body.uid;
+
   // Check for authHeaders
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (!authHeader?.startsWith("Bearer ")) {
     return res.status(401).json({ error: "Missing or invalid token" });
   }
 
+  const token = authHeader.split(" ")[1];
   // Check if token exists
   if (!token) {
-    return res.status(401).json({ msg: "Authentication required" });
+    return res.status(403).json({ msg: "Authentication required" });
   }
 
   try {

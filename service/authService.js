@@ -28,6 +28,7 @@ class AuthService {
 
   static async verifyAccessToken(id, token) {
     // If the token is expired check for the user refresh token
+
     try {
       if (!token) throw new Error("Token not provided");
       const verifiedToken = jwt.verify(token, ACCESS_TOKEN_SECRET);
@@ -55,7 +56,7 @@ class AuthService {
           if (!refreshTokenData) throw new Error("Invalid refresh token");
           // 5. Generate new access token
           const user = {
-            id: refreshTokenData.id,
+            uid: id,
             name: refreshTokenData.name,
             email: refreshTokenData.email,
             role: refreshTokenData.role,
@@ -122,7 +123,10 @@ class AuthService {
           const refreshToken = this.generateRefreshToken(user);
           connection.query(`CALL insertToken(?,?)`, [uid, refreshToken]);
           const accessToken = this.generateAccessToken(user);
-          return resolve({ accessToken: accessToken });
+          return resolve({
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+          });
         }
 
         const token = result.flat()[0].token;
@@ -135,10 +139,16 @@ class AuthService {
             const refreshToken = this.generateRefreshToken(user);
             connection.query(`CALL insertToken(?,?)`, [uid, refreshToken]);
             const accessToken = this.generateAccessToken(user);
-            return resolve({ accessToken: accessToken });
+            return resolve({
+              accessToken: accessToken,
+              refreshToken: refreshToken,
+            });
           }
           const accessToken = this.generateAccessToken(user);
-          return resolve({ accessToken: accessToken });
+          return resolve({
+            accessToken: accessToken,
+            refreshToken: token,
+          });
         });
       });
     });

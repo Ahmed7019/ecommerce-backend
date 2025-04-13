@@ -21,14 +21,21 @@ router.post("/login", login);
 
 router.get("/", authMiddleware, (req, res) => {
   const user = {
-    uid: req.user.uid,
+    uid: req.body.uid,
     name: req.user.name,
     email: req.user.email,
     role: req.user.role,
   };
-  res.json(user);
+  if (req.user.newAccessToken) {
+    console.log(req.user);
+    return res
+      .status(200)
+      .json({ newAccessToken: req.user.newAccessToken, user: req.user.user });
+  } else {
+    res.status(200).json(user);
+  }
 });
 
 // @desc refresh the token if expired
-router.post("/token", refreshToken);
+router.get("/token", refreshToken);
 export default router;

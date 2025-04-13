@@ -46,7 +46,11 @@ export const login = async (req, res, next) => {
       const user = AuthService.loginUser(payload, password);
       if (!user) console.log("error with user");
       user.then((data) => {
-        res.status(200).json(data);
+        res.cookie("jwt", data.refreshToken, {
+          httpOnly: true,
+          maxAge: 24 * 7 * 60 * 60 * 1000,
+        });
+        res.json({ accessToken: data.accessToken });
       });
     });
   } catch (error) {
@@ -59,7 +63,7 @@ export const refreshToken = async (req, res) => {
   const accessToken = authHeader && authHeader.split(" ")[1];
   const uid = req.body.uid;
   if (accessToken == null)
-    return res.status(400).json({ msg: "Access Denied !" });
+    return res.status(401).json({ msg: "Access Denied !" });
   const verified = await AuthService.verifyAccessToken(uid, accessToken);
   if (!verified) {
     try {
