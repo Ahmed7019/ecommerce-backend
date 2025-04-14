@@ -1,7 +1,7 @@
 import AuthService from "../service/authService.js";
 
 const authMiddleware = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  const authHeader = req.headers.authorization || req.headers.Authorization;
   const id = req.body.uid;
 
   // Check for authHeaders
