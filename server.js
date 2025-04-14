@@ -5,6 +5,7 @@ import products from "./Routes/products.js";
 import stores from "./Routes/stores.js";
 import user from "./Routes/user.js";
 import authRoute from "./Routes/authRoute.js";
+import refresh from "./Routes/refresh.js";
 
 import bodyParser from "body-parser";
 import logger from "./middleware/logger.js";
@@ -12,6 +13,7 @@ import errorHandler from "./middleware/error.js";
 import notFound from "./middleware/notFound.js";
 import connection from "./Database/connection.js";
 import cookieParser from "cookie-parser";
+import { verifyJWT } from "./middleware/verifyJWT.js";
 
 const PORT = process.env.PORT || 8080;
 
@@ -29,13 +31,15 @@ app.use(logger);
 // Routes
 app.use("/api/products", products);
 app.use("/api/stores", stores);
-app.use("/api/user", user);
 app.use("/auth", authRoute);
+app.use("/refresh", refresh);
+
+app.use(verifyJWT);
+app.use("/api/user", user);
 
 // Error handler
 app.use(notFound);
 app.use(errorHandler);
-
 // Connect to DB
 
 connection.connect((err) => {

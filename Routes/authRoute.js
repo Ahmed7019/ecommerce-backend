@@ -4,7 +4,7 @@ import {
   authenticateUser,
   register,
   login,
-  refreshToken,
+  // refreshToken,
 } from "../controllers/authController.js";
 const router = express.Router();
 import multer from "multer";
@@ -21,13 +21,12 @@ router.post("/login", login);
 
 router.get("/", authMiddleware, (req, res) => {
   const user = {
-    uid: req.body.uid,
+    uid: req.user.uid,
     name: req.user.name,
     email: req.user.email,
     role: req.user.role,
   };
   if (req.user.newAccessToken) {
-    console.log(req.user);
     return res
       .status(200)
       .json({ newAccessToken: req.user.newAccessToken, user: req.user.user });
@@ -37,5 +36,5 @@ router.get("/", authMiddleware, (req, res) => {
 });
 
 // @desc refresh the token if expired
-router.get("/token", refreshToken);
+// router.get("/token", refreshToken);
 export default router;

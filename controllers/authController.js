@@ -57,39 +57,3 @@ export const login = async (req, res, next) => {
     console.log(error);
   }
 };
-
-export const refreshToken = async (req, res) => {
-  const authHeader = req.headers["authorization"];
-  const accessToken = authHeader && authHeader.split(" ")[1];
-  const uid = req.body.uid;
-  if (accessToken == null)
-    return res.status(401).json({ msg: "Access Denied !" });
-  const verified = await AuthService.verifyAccessToken(uid, accessToken);
-  if (!verified) {
-    try {
-      const refreshToken = connection.query(`CALL getToken(?)`, [uid]);
-      if (refreshToken) {
-        const verifyRefreshToken = AuthService.verifyRefreshToken(refreshToken);
-        if (verifyRefreshToken) {
-          const result = connection.query(`CALL getUserById(?)`, [uid]);
-          if (result[0]) {
-            const payload = result.flat()[0];
-            const user = {
-              uid: uid,
-              name: payload.name,
-              email: payload.email,
-              role: payload.role,
-            };
-
-            const newAccessToken = AuthService.generateAccessToken(user);
-            return res.status(200).json({ token: newAccessToken });
-          }
-        }
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  res.status(200).json({ token: accessToken });
-};
