@@ -9,7 +9,7 @@ export default function handleRefreshToken(req, res) {
 
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
     if (err) return res.sendStatus(403);
-    console.log(decoded);
+
     const user = {
       uid: decoded.uid,
       name: decoded.name,

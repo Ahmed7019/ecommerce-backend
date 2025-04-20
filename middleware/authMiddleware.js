@@ -1,8 +1,8 @@
 import AuthService from "../service/authService.js";
-
+import jwt from "jsonwebtoken";
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const authMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization || req.headers.Authorization;
-  const id = req.body.uid;
 
   // Check for authHeaders
   if (!authHeader?.startsWith("Bearer ")) {
@@ -11,16 +11,18 @@ const authMiddleware = async (req, res, next) => {
 
   const token = authHeader.split(" ")[1];
   // Check if token exists
-  if (!token) {
+  if (!token || token == null) {
     return res.status(403).json({ msg: "Authentication required" });
   }
 
   try {
-    const decoded = await AuthService.verifyAccessToken(id, token);
-    req.user = decoded;
-    next();
+    jwt.verify(token, ACCESS_TOKEN_SECRET, (err, decoded) => {
+      req.user = decoded;
+      next();
+    });
   } catch (err) {
     if (err.name === "TokenExpiredError") console.log("err");
+    else console.log(err.name);
     return res.status(401).json({ msg: "Invalid or expired token" });
   }
 };
