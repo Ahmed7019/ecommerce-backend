@@ -1,9 +1,6 @@
 import connection from "../Database/connection.js";
-import multer from "multer";
 
 import bcrypt from "bcrypt";
-
-const upload = multer();
 
 // @desc    Get the user using id
 // @route   GET /api/user/id
@@ -29,9 +26,6 @@ export const getUserById = (req, res, next) => {
     res.status(200).json(result[0]);
   });
 };
-
-// @desc    Create a new user
-// @route   POST /api/ user
 
 //  @desc     Update an existing user
 //  @route    PUT  / api/user/:id
@@ -73,10 +67,11 @@ export const updateUserRole = (req, res, next) => {
     err.status = 400;
     return next(err);
   }
-
-  connection.query(`CALL updateUserRole(${uid},"${role}")`, (err, result) => {
+  console.log(uid);
+  connection.query(`CALL updateUserRole(?,?)`, [uid, role], (err, result) => {
     if (err) return next(err);
-    res.status(200).json({ msg: "Update successfully !" });
+    console.log(result);
+    return res.status(200).json({ msg: "Update successfully !" });
   });
 };
 // @desc    Delete user

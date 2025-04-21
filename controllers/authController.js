@@ -26,7 +26,17 @@ export const register =
       [name, email, hashedPassword],
       (err, result) => {
         if (err) return next(err);
-        res.status(200).json({ msg: "User created successfully !" });
+
+        connection.query(`CALL getUserByEmail(?)`, [email], (err, result) => {
+          if (err) return next(err);
+
+          res
+            .status(200)
+            .json({
+              msg: "User created successfully !",
+              id: result.flat()[0].user_id,
+            });
+        });
       }
     );
   });
