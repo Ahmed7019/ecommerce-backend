@@ -3,7 +3,7 @@ import {
   deleteUser,
   getUserById,
   updateUser,
-  updateUserRole,
+  // updateUserRole,
 } from "../controllers/usersController.js";
 
 const router = express.Router();
@@ -14,7 +14,7 @@ router.get("/:uid", getUserById);
 // @desc Update user info
 router.put("/update-profile", updateUser);
 
-router.put("/update-role", updateUserRole);
+
 
 // @desc delte a user
 router.delete("/:uid", deleteUser);

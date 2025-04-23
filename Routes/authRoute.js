@@ -4,7 +4,8 @@ import {
   authenticateUser,
   register,
   login,
-  // refreshToken,
+  logout,
+  updateUserRole,
 } from "../controllers/authController.js";
 const router = express.Router();
 import multer from "multer";
@@ -35,6 +36,9 @@ router.get("/", authMiddleware, (req, res) => {
   }
 });
 
-// @desc refresh the token if expired
-// router.get("/token", refreshToken);
+// @desc logout the user
+router.get("/logout", logout);
+
+// @desc update user role
+router.put("/update-role", updateUserRole);
 export default router;

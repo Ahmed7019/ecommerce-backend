@@ -30,12 +30,10 @@ export const register =
         connection.query(`CALL getUserByEmail(?)`, [email], (err, result) => {
           if (err) return next(err);
 
-          res
-            .status(200)
-            .json({
-              msg: "User created successfully !",
-              id: result.flat()[0].user_id,
-            });
+          res.status(200).json({
+            msg: "User created successfully !",
+            id: result.flat()[0].user_id,
+          });
         });
       }
     );
@@ -66,4 +64,27 @@ export const login = async (req, res, next) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+export const logout = (req, res) => {
+  const cookies = req.cookies;
+  if (!cookies?.jwt) return res.sendStatus(204);
+  res.clearCookie("jwt");
+  res.sendStatus(204);
+};
+
+export const updateUserRole = (req, res, next) => {
+  const { uid, role } = req.body;
+
+  if (!uid || !role) {
+    const err = new Error("Bad request");
+    err.status = 400;
+    return next(err);
+  }
+  console.log(uid);
+  connection.query(`CALL updateUserRole(?,?)`, [uid, role], (err, result) => {
+    if (err) return next(err);
+    console.log(result);
+    return res.status(200).json({ msg: "Update successfully !" });
+  });
 };

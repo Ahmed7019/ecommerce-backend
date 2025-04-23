@@ -59,21 +59,7 @@ export const updateUser = async (req, res, next) => {
   );
 };
 
-export const updateUserRole = (req, res, next) => {
-  const { uid, role } = req.body;
 
-  if (!uid || !role) {
-    const err = new Error("Bad request");
-    err.status = 400;
-    return next(err);
-  }
-  console.log(uid);
-  connection.query(`CALL updateUserRole(?,?)`, [uid, role], (err, result) => {
-    if (err) return next(err);
-    console.log(result);
-    return res.status(200).json({ msg: "Update successfully !" });
-  });
-};
 // @desc    Delete user
 // @route   DELETE /api/user/:id
 export const deleteUser = (req, res, next) => {
