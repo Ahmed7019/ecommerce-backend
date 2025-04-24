@@ -46,20 +46,21 @@ export const getProductByName = (req, res, next) => {
 // @route   GET /api /products /id /:id
 
 export const getProductById = (req, res, next) => {
-  const id = parseInt(req.params.id);
-  if (!id) {
+  const id = req.params.id;
+  const uid = parseInt(id);
+  if (!uid) {
     const error = new Error(
-      `Bad request : request body doesn't have a product id`
+      `Bad request : request param doesn't have a product id`
     );
     error.status = 400;
     return next(error);
   }
 
-  connection.query(`CALL getProductById(${id})`, (err, result) => {
+  connection.query(`CALL getProductById(?)`, [uid], (err, result) => {
     if (err) return next(err);
 
     if (result[0].length === 0) {
-      const error = new Error(`Product with ID ${id} doesn't exist`);
+      const error = new Error(`Product with ID ${uid} doesn't exist`);
       error.status = 404;
       return next(error);
     }
