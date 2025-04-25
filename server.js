@@ -6,7 +6,7 @@ import stores from "./Routes/stores.js";
 import user from "./Routes/user.js";
 import authRoute from "./Routes/authRoute.js";
 import refresh from "./Routes/refresh.js";
-
+import cart from "./Routes/cart.js";
 import bodyParser from "body-parser";
 import logger from "./middleware/logger.js";
 import errorHandler from "./middleware/error.js";
@@ -41,6 +41,7 @@ app.use("/refresh", refresh);
 
 app.use(verifyJWT);
 app.use("/api/user", user);
+app.use("/cart", cart);
 
 // Error handler
 app.use(notFound);

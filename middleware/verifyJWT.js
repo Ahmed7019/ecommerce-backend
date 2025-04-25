@@ -1,8 +1,9 @@
 import jwt from "jsonwebtoken";
 export const verifyJWT = (req, res, next) => {
-  const authHeader = req.headers["authorization"];
+  const authHeader =
+    req.headers["authorization"] || req.headers["Authorization"];
 
-  if (!authHeader) return res.status(403); // Forbidden
+  if (!authHeader) return res.sendStatus(401); // Forbidden
 
   const accessToken = authHeader.split(" ")[1];
 
