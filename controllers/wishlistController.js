@@ -29,7 +29,6 @@ export const getWishlist = async (req, res, next) => {
   }
   try {
     const data = await getWishlistFromDb(uid);
-    console.log(data);
     res.json(data);
   } catch (error) {
     console.error(error);
