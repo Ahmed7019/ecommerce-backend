@@ -1,10 +1,10 @@
-import { addToWishlistDb } from "../Database/cartDb.js";
+import { addToWishlistDb, getWishlistFromDb } from "../Database/cartDb.js";
 
 // @desc add product to wishlist
-// @route POST /product/id
+// @route POST /cart/:proudctId
+
 export const addToWishlist = async (req, res) => {
   const { productId } = req.params;
-  console.log(req.headers);
   const { userId } = req.body;
   if (!productId || !userId) console.log("Big error");
 
@@ -14,5 +14,24 @@ export const addToWishlist = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
+  }
+};
+
+// @desc get wishlist products
+// @route GET /cart/:uid
+
+export const getWishlist = async (req, res, next) => {
+  const { uid } = req.params;
+  if (!uid) {
+    const err = new Error("Missing uid");
+    err.sendStatus(400);
+    return next(err);
+  }
+  try {
+    const data = await getWishlistFromDb(uid);
+    console.log(data);
+    res.json(data);
+  } catch (error) {
+    console.error(error);
   }
 };
