@@ -20,9 +20,23 @@ export const getWishlistFromDb = async (uid) => {
         resolve(res[0].flat());
       });
     });
-
-    return data;
   } catch (error) {
     throw new Error(error);
   }
+};
+
+export const removeFromWishlistDb = async (uid, pid) => {
+  try {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        "call removeFromWishlist(?,?)",
+        [uid, pid],
+        (err, result) => {
+          if (err) return reject(err);
+
+          console.log(result);
+        }
+      );
+    });
+  } catch (error) {}
 };

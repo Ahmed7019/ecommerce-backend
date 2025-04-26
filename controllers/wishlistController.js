@@ -1,4 +1,8 @@
-import { addToWishlistDb, getWishlistFromDb } from "../Database/cartDb.js";
+import {
+  addToWishlistDb,
+  getWishlistFromDb,
+  removeFromWishlistDb,
+} from "../Database/cartDb.js";
 
 // @desc add product to wishlist
 // @route POST /cart/:proudctId
@@ -32,5 +36,26 @@ export const getWishlist = async (req, res, next) => {
     res.json(data);
   } catch (error) {
     console.error(error);
+  }
+};
+
+// @desc delete product from wishlist
+// @route DELETE /cart/:proudctId
+
+export const removeFromWishlist = async (req, res, next) => {
+  const { uid } = req.body;
+  const { productId } = req.params;
+
+  if (!uid || !productId) {
+    const err = new Error("Bad request");
+    err.status = 400;
+    return next(err);
+  }
+
+  try {
+    await removeFromWishlistDb(uid, productId);
+    res.sendStatus(204);
+  } catch (error) {
+    res.sendStatus(409);
   }
 };
