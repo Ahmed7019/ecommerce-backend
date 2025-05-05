@@ -15,7 +15,7 @@ export const getWishlistFromDb = async (uid) => {
   try {
     return new Promise((resolve, reject) => {
       connection.query("CALL getWishlist(?)", [uid], (err, res) => {
-        if (!res[0]) return reject({ error: "Not found in db" });
+        if (!res) return reject({ error: "Not found in db" });
         if (err) return reject({ err });
         resolve(res[0].flat());
       });
@@ -34,7 +34,7 @@ export const removeFromWishlistDb = async (uid, pid) => {
         (err, result) => {
           if (err) return reject(err);
 
-          console.log(result);
+          return resolve(result.flat()[0]);
         }
       );
     });

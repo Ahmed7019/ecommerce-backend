@@ -23,7 +23,7 @@ export const getStores = (req, res, next) => {
   });
 };
 
-// @desc    Get a store by Id
+// @desc    Get a store by userId
 // @route   /api/stores/id/:id
 
 export const getStoreById = (req, res, next) => {
@@ -50,21 +50,17 @@ export const createNewStore =
   (upload.array(),
   (req, res, next) => {
     // Check if request body is valid
-    if (
-      !req.body.name ||
-      !req.body.description ||
-      !req.body.store_email ||
-      !req.body.id
-    ) {
+    const { name, description, store_email, ownerId } = req.body;
+    console.log(req.body);
+    if (!name || !description || !store_email || !ownerId) {
       const err = new Error("Missing body fields");
       err.status = 400;
       return next(err);
     }
 
     connection.query(
-      `CALL createNewStore('${req.body.name}',
-    "${req.body.description}","${req.body.store_email}","${req.body.id}"
-      )`,
+      `CALL createNewStore(?,?,?,?)`,
+      [name, description, store_email, ownerId],
       (err, result) => {
         if (err) {
           err.status = 500;

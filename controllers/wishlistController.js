@@ -45,7 +45,7 @@ export const getWishlist = async (req, res, next) => {
 export const removeFromWishlist = async (req, res, next) => {
   const { uid } = req.body;
   const { productId } = req.params;
-
+  console.log(productId);
   if (!uid || !productId) {
     const err = new Error("Bad request");
     err.status = 400;
