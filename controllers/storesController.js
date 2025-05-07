@@ -9,6 +9,7 @@ const upload = multer();
 export const getStores = (req, res, next) => {
   connection.query(`CALL getAllStores()`, (err, result) => {
     if (err) {
+      console.log(err);
       err.status = 500;
       return next(err);
     }
@@ -27,19 +28,18 @@ export const getStores = (req, res, next) => {
 // @route   /api/stores/id/:id
 
 export const getStoreById = (req, res, next) => {
-  const id = parseInt(req.params.id);
-  connection.query(`CALL getStoreById(${id})`, (err, result) => {
+  const { id } = req.params;
+  const uid = parseInt(id);
+  connection.query(`CALL getStoreById(?)`, [uid], (err, result) => {
     if (err) {
       err.status = 500;
       return next(err);
     }
-
-    if (result.affectedRows === 0) {
-      const error = new Error(`Store with ID ${id} was not found`);
+    if (!result[0] || result[0].length === 0) {
+      const error = new Error(`STORE_NOT_FOUND`);
       error.status = 404;
-      return next(err);
+      return next(error);
     }
-    console.log("RESULT", result[0]);
     res.status(200).json(result[0]);
   });
 };
