@@ -30,18 +30,20 @@ export const getStores = (req, res, next) => {
 export const getStoreById = (req, res, next) => {
   const { id } = req.params;
   const uid = parseInt(id);
-  connection.query(`CALL getStoreById(?)`, [uid], (err, result) => {
-    if (err) {
-      err.status = 500;
-      return next(err);
-    }
-    if (!result[0] || result[0].length === 0) {
-      const error = new Error(`STORE_NOT_FOUND`);
-      error.status = 404;
-      return next(error);
-    }
-    res.status(200).json(result[0]);
-  });
+  uid &&
+    connection.query(`CALL getStoreById(?)`, [uid], (err, result) => {
+      if (err) {
+        console.log(err);
+        err.status = 500;
+        return next(err);
+      }
+      if (!result[0] || result[0].length === 0) {
+        const error = new Error(`STORE_NOT_FOUND`);
+        error.status = 404;
+        return next(error);
+      }
+      res.status(200).json(result[0]);
+    });
 };
 
 // @desc    POST a store
